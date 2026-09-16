@@ -28,3 +28,5 @@ header.hero .header-social a{background:#30201680;border-color:#dfb97080}
 header.hero .header-social a:hover{background:#674526}
 header.hero .hero-rule{color:#f2dfbf;border-color:#dfb97066}
 @media(max-width:600px){header.hero{background-position:52% center}header.hero .top{padding-top:24px}header.hero .intro{padding-top:32px;padding-bottom:20px}}
+/* Allow the longer menu tagline to wrap comfortably on small screens. */
+.menu-summary{gap:12px;flex-wrap:wrap;line-height:1.6}
