@@ -26,6 +26,33 @@
   document.body.append(dock, dialog, status);
   const items = dialog.querySelector('.plan-items');
   const summary = dialog.querySelector('.plan-summary');
+  const messengerButton = document.createElement('button');
+  messengerButton.type = 'button'; messengerButton.className = 'plan-messenger'; messengerButton.textContent = 'Gửi qua Messenger';
+  dialog.querySelector('.plan-actions').append(messengerButton);
+  const sharePanel = document.createElement('div'); sharePanel.className = 'plan-share'; sharePanel.hidden = true;
+  const shareNote = document.createElement('p'); shareNote.setAttribute('role', 'status');
+  const shareText = document.createElement('textarea'); shareText.readOnly = true; shareText.rows = 7; shareText.setAttribute('aria-label', 'Nội dung thực đơn để gửi qua Messenger');
+  const messengerLink = document.createElement('a'); messengerLink.href = 'https://m.me/trainghiemdpathainguyen'; messengerLink.target = '_blank'; messengerLink.rel = 'noopener noreferrer'; messengerLink.textContent = 'Mở Messenger nhà hàng';
+  sharePanel.append(shareNote, shareText, messengerLink); dialog.append(sharePanel);
+  messengerButton.onclick = async () => {
+    if (!selected.size) return;
+    let low = 0, high = 0, unknown = 0;
+    const lines = ['THỰC ĐƠN DỰ KIẾN — KHU TRẢI NGHIỆM DPA', 'Xin chào nhà hàng, tôi muốn được tư vấn thực đơn sau:', ''];
+    selected.forEach((qty, id) => {
+      const item = catalog[Number(id)];
+      lines.push(`${lines.length - 2}. ${item.name} (${item.category}) — SL: ${qty} — Đơn giá: ${item.price} — Thành tiền: ${item.range ? format(item.range[0] * qty, item.range[1] * qty) : 'Cần báo giá'}`);
+      if (item.range) { low += item.range[0] * qty; high += item.range[1] * qty; } else unknown += qty;
+    });
+    lines.push('', `${unknown ? 'Tạm tính các món đã có giá' : 'Tổng tiền dự kiến'}: ${format(low, high)}`);
+    if (unknown) lines.push(`${unknown} lựa chọn cần báo giá, chưa cộng vào tổng.`);
+    lines.push('Số lượng theo đơn vị trên menu; món không ghi đơn vị tính theo phần.', 'Nhờ nhà hàng xác nhận giá và tư vấn đặt bàn.');
+    shareText.value = lines.join('\n'); sharePanel.hidden = false;
+    shareText.focus(); shareText.select();
+    let copied = false;
+    try { copied = document.execCommand('copy'); } catch (_) {}
+    if (!copied) { try { await navigator.clipboard.writeText(shareText.value); copied = true; } catch (_) {} }
+    shareNote.textContent = copied ? 'Đã sao chép thực đơn. Mở Messenger bên dưới, dán nội dung rồi nhấn Gửi.' : 'Hãy sao chép nội dung bên dưới, mở Messenger rồi dán và gửi cho nhà hàng.';
+  };
   const printButton = document.createElement('button');
   printButton.type = 'button'; printButton.className = 'plan-print'; printButton.textContent = 'In thực đơn';
   dialog.querySelector('.plan-heading').append(printButton);
@@ -65,6 +92,7 @@
   }
   const format = (low, high) => low === high ? money(low) : `${money(low)} – ${money(high)}`;
   function render() {
+    sharePanel.hidden = true;
     items.replaceChildren();
     let low = 0, high = 0, count = 0, unknown = 0;
     selected.forEach((qty, id) => {
@@ -83,6 +111,7 @@
     });
     if (!count) { const empty = document.createElement('p'); empty.className = 'plan-empty'; empty.textContent = 'Chưa có món nào. Nhấn dấu + cạnh món bạn thích để tạo thực đơn.'; items.append(empty); }
     printButton.disabled = !count;
+    messengerButton.disabled = !count;
     summary.replaceChildren();
     const label = document.createElement('span'); label.textContent = unknown ? 'Tạm tính các món đã có giá' : 'Tổng tiền dự kiến';
     const total = document.createElement('strong'); total.textContent = format(low, high);
