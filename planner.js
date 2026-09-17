@@ -26,6 +26,31 @@
   document.body.append(dock, dialog, status);
   const items = dialog.querySelector('.plan-items');
   const summary = dialog.querySelector('.plan-summary');
+  const printButton = document.createElement('button');
+  printButton.type = 'button'; printButton.className = 'plan-print'; printButton.textContent = 'In thực đơn';
+  dialog.querySelector('.plan-heading').append(printButton);
+  printButton.onclick = () => {
+    if (!selected.size) return;
+    const sheet = document.createElement('section');
+    sheet.className = 'plan-print-sheet';
+    const brand = document.createElement('h1'); brand.textContent = 'KHU TRẢI NGHIỆM DPA';
+    const contact = document.createElement('p'); contact.textContent = 'Km9 Hóa Trung, Đồng Hỷ, Thái Nguyên · 0967 986 768';
+    const title = document.createElement('h2'); title.textContent = 'THỰC ĐƠN DỰ KIẾN';
+    const list = items.cloneNode(true);
+    list.querySelectorAll('.plan-controls').forEach(control => {
+      const qty = control.querySelector('span').textContent;
+      control.replaceChildren(); control.textContent = 'Số lượng: ' + qty;
+    });
+    const note = document.createElement('p'); note.textContent = 'Số lượng theo đơn vị ghi trên menu; món không ghi đơn vị tính theo phần. Giá dự kiến để tham khảo, nhà hàng xác nhận khi đặt bàn.';
+    sheet.append(brand, contact, title, list, summary.cloneNode(true), note);
+    document.body.append(sheet);
+    dialog.close(); document.body.classList.remove('plan-open');
+    document.body.classList.add('printing-plan');
+    try { window.print(); } finally {
+      document.body.classList.remove('printing-plan'); sheet.remove();
+      dialog.showModal(); document.body.classList.add('plan-open');
+    }
+  };
   const close = () => { dialog.close(); document.body.classList.remove('plan-open'); };
   dock.onclick = () => { dialog.showModal(); document.body.classList.add('plan-open'); };
   dialog.querySelector('.plan-close').onclick = close;
@@ -57,6 +82,7 @@
       controls.append(minus, number, plus, remove); row.append(title, detail, subtotal, controls); items.append(row);
     });
     if (!count) { const empty = document.createElement('p'); empty.className = 'plan-empty'; empty.textContent = 'Chưa có món nào. Nhấn dấu + cạnh món bạn thích để tạo thực đơn.'; items.append(empty); }
+    printButton.disabled = !count;
     summary.replaceChildren();
     const label = document.createElement('span'); label.textContent = unknown ? 'Tạm tính các món đã có giá' : 'Tổng tiền dự kiến';
     const total = document.createElement('strong'); total.textContent = format(low, high);
