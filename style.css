@@ -43,3 +43,4 @@ body{padding-bottom:86px}.dish-card{position:relative}.dish-details{padding-righ
 /* Slightly smaller suggested-set posters, centered without cropping. */
 .suggested-set .set-poster{width:85%;margin:16px auto 0;border-radius:8px;overflow:hidden}
 .new-beer{min-height:120px;border-left:4px solid #b58a45}.new-beer .dish-details{width:100%;padding:20px 48px 20px 18px}
+.new-beer-photo{background-image:url('assets/hanoi-beers.jpg');background-size:300% 100%}.new-beer .dish-details{width:auto;padding:15px 46px 15px 12px}.new-beer{border-left:1px solid #c4a47733}
