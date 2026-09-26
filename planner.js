@@ -4,7 +4,7 @@
     const values = (text.match(/\d[\d.]*/g) || []).map(x => Number(x.replaceAll('.', '')));
     return values.length ? [Math.min(...values), Math.max(...values)] : null;
   }
-  const catalog = [...document.querySelectorAll('.dish-card')].sort((a, b) => Number(a.classList.contains('suggested-set')) - Number(b.classList.contains('suggested-set'))).map((card, i) => {
+  const catalog = [...document.querySelectorAll('.dish-card')].sort((a, b) => (a.classList.contains('new-beer') ? 2 : Number(a.classList.contains('suggested-set'))) - (b.classList.contains('new-beer') ? 2 : Number(b.classList.contains('suggested-set')))).map((card, i) => {
     const name = card.querySelector('h3').textContent;
     const price = card.querySelector('strong').textContent;
     const category = card.closest('section').querySelector('h2').textContent;
